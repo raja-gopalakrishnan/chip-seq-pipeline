@@ -1,0 +1,223 @@
+#Specify names and barcodes for each sample
+samples:
+    ha-wt-1 :   
+      barcode: "ATCACG"
+      group: "wt"
+      ip: "ha"
+    ha-spt6-1 :   
+      barcode: "CGATGT"
+      group: "spt6"
+      ip: "ha"
+    ha-spt6-set2-1 :   
+      barcode: "TTAGGC"
+      group: "spt6-set2"
+      ip: "ha"
+    ha-set2-1 :   
+      barcode: "TGACCA"
+      group: "set2"
+      ip: "ha"
+
+    ha-wt-2 :   
+      barcode: "ACAGTG"
+      group: "wt"
+      ip: "ha"
+    ha-spt6-2 :   
+      barcode: "GCCAAT"
+      group: "spt6"
+      ip: "ha"
+    ha-spt6-set2-2 :   
+      barcode: "CAGATC"
+      group: "spt6-set2"
+      ip: "ha"
+    ha-set2-2 :   
+      barcode: "ACTTGA"
+      group: "set2"
+      ip: "ha"
+
+    pol2-wt-1 :   
+      barcode: "GATCAG"
+      group: "wt"
+      ip: "pol2"
+    pol2-spt6-1 :   
+      barcode: "TAGCTT"
+      group: "spt6"
+      ip: "pol2"
+    pol2-spt6-set2-1 :   
+      barcode: "GGCTAC"
+      group: "spt6-set2"
+      ip: "pol2"
+    pol2-set2-1 :   
+      barcode: "CTTGTA"
+      group: "set2"
+      ip: "pol2"
+
+    pol2-wt-2 :   
+      barcode: "ATATAGGA"
+      group: "wt"
+      ip: "pol2"
+    pol2-spt6-2 :   
+      barcode: "AACCGTGT"
+      group: "spt6"
+      ip: "pol2"
+    pol2-spt6-set2-2 :   
+      barcode: "AGGTCAGT"
+      group: "spt6-set2"
+      ip: "pol2"
+    pol2-set2-2 :   
+      barcode: "CTCTGTCT"
+      group: "set2"
+      ip: "pol2"
+
+    h3k36me2-wt-1 :   
+      barcode: "CCATACAC"
+      group: "wt"
+      ip: "h3k36me2"
+    h3k36me2-spt6-1 :   
+      barcode: "CGCATTAA"
+      group: "spt6"
+      ip: "h3k36me2"
+    h3k36me2-spt6-set2-1 :   
+      barcode: "GTCTACAT"
+      group: "spt6-set2"
+      ip: "h3k36me2"
+    h3k36me2-set2-1 :   
+      barcode: "GAGTTAAC"
+      group: "set2"
+      ip: "h3k36me2"
+
+    h3k36me2-wt-2 :   
+      barcode: "GCAGCCTC"
+      group: "wt"
+      ip: "h3k36me2"
+    h3k36me2-spt6-2 :   
+      barcode: "TCGCGTAC"
+      group: "spt6"
+      ip: "h3k36me2"
+    h3k36me2-spt6-set2-2 :   
+      barcode: "TATACCGT"
+      group: "spt6-set2"
+      ip: "h3k36me2"
+    h3k36me2-set2-2 :   
+      barcode: "TGCGGTTA"
+      group: "set2"
+      ip: "h3k36me2"
+
+    h3k36me3-wt-1 :   
+      barcode: "AACACCTAC"
+      group: "wt"
+      ip: "h3k36me3"
+    h3k36me3-spt6-1 :   
+      barcode: "CCTTTACAG"
+      group: "spt6"
+      ip: "h3k36me3"
+    h3k36me3-spt6-set2-1 :   
+      barcode: "GGTCCTTGA"
+      group: "spt6-set2"
+      ip: "h3k36me3"
+    h3k36me3-set2-1 :   
+      barcode: "TTGAGTGT"
+      group: "set2"
+      ip: "h3k36me3"
+
+    h3k36me3-wt-2 :   
+      barcode: "ACTAACTGC"
+      group: "wt"
+      ip: "h3k36me3"
+    h3k36me3-spt6-2 :   
+      barcode: "CAGGAGGCG"
+      group: "spt6"
+      ip: "h3k36me3"
+    h3k36me3-spt6-set2-2 :   
+      barcode: "GTTGTCCCA"
+      group: "spt6-set2"
+      ip: "h3k36me3"
+    h3k36me3-set2-2 :   
+      barcode: "TGACGCAT"
+      group: "set2"
+      ip: "h3k36me3"
+
+    h3-wt-1 :   
+      barcode: "ATCGCCAGC"
+      group: "wt"
+      ip: "h3"
+    h3-spt6-1 :   
+      barcode: "CATTCCAAG"
+      group: "spt6"
+      ip: "h3"
+    h3-spt6-set2-1 :   
+      barcode: "GCAAGTAGA"
+      group: "spt6-set2"
+      ip: "h3"
+    h3-set2-1 :   
+      barcode: "TGATCCGA"
+      group: "set2"
+      ip: "h3"
+
+    h3-wt-2 :   
+      barcode: "ACGTAGCTC"
+      group: "wt"
+      ip: "h3"
+    h3-spt6-2 :   
+      barcode: "CGAACTGTG"
+      group: "spt6"
+      ip: "h3"
+    h3-spt6-set2-2 :   
+      barcode: "TAGCTAGTA"
+      group: "spt6-set2"
+      ip: "h3"
+    h3-set2-2 :   
+      barcode: "GTGGGATA"
+      group: "set2"
+      ip: "h3"
+
+    input-wt-1 :   
+      barcode: "ATCCTATTC"
+      group: "wt"
+      ip: "input"
+    input-spt6-1 :   
+      barcode: "CGGACGTGG"
+      group: "spt6"
+      ip: "input"
+    input-spt6-set2-1 :   
+      barcode: "GCGTTTCGA"
+      group: "spt6-set2"
+      ip: "input"
+    input-set2-1 :   
+      barcode: "TATCTCCG"
+      group: "set2"
+      ip: "input"
+
+    input-wt-2 :   
+      barcode: "CACAGTTGG"
+      group: "wt"
+      ip: "input"
+    input-spt6-2 :   
+      barcode: "GTGACTACA"
+      group: "spt6"
+      ip: "input"
+    input-spt6-set2-2 :   
+      barcode: "TGAGAGTG"
+      group: "spt6-set2"
+      ip: "input"
+    input-set2-2 :   
+      barcode: "AATGCTGAC" 
+      group: "set2"
+      ip: "input"
+
+      
+#Provide name of the fastq file
+fastq:
+    "Undetermined_S0.R1.fastq.gz"
+#Demultiplexing paramaters
+demultiplex:
+    #Number of bases in barcode for which a mismatch is permitted
+    mismatch: 1
+# Cutadapt quality cutoff parameters
+cutadapt:
+    qual_cutoff: 20
+    min_length: 5
+
+threads: 4
+
+imagetype:
+  plot_spikein_percentage: "png"
