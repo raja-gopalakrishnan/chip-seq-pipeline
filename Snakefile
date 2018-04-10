@@ -3,6 +3,7 @@
 configfile: "config.yaml"
 SAMPLES = config["samples"]
 ANNOTATIONS = config["annotations"]
+
 PEAK_TREATMENT = list(config["callpeaks"].keys())
 PEAK_CONTROL = list(config["callpeaks"].values())
 NORMALIZATIONS = list(config["normalizations"].keys())
@@ -19,19 +20,18 @@ def uniq(input):
             output.append(x)
     return output
 
-#level_one is a list of all sample names
-#level_two is a list of the dictionaries associated with each sample name
-level_one=[k for k,v in SAMPLES.items()]
-level_two=[v for k,v in SAMPLES.items()]
-
 #Function that returns the names of samples associated with a particular attribute
 #Example: attribute = ip and value = ha will give the names of all samples have been subjected to a ha ip
-def names(attribute, value):
-    output=[]
-    for i in range(0,len(level_two)):
-        if level_two[i][attribute]==value :
-            output.append(level_one[i])
-    return output
+def names(dictionary, attribute, value):
+	output=[]
+    #example: If dictionary is SAMPLES, level_one is a list of all sample names
+	#example: If dictionary is SAMPLES, level_two is a list of the dictionaries associated with each sample name
+	level_one=[k for k,v in dictionary.items()]
+	level_two=[v for k,v in dictionary.items()]
+	for i in range(0,len(level_two)):
+		if level_two[i][attribute]==value :
+			output.append(level_one[i])
+	return output
 
 localrules: all,
    	    make_barcode_file
@@ -77,25 +77,33 @@ rule all:
 		#bedgraph_to_bigwig
 		expand("bigwigfiles/{species}_norm{norm}/{sample}_{species}_norm{norm}.bw", sample = SAMPLES, norm=["RPM","SI"], species = ["Scer","Spom"]),
 		#deeptools_matrix_individual
-		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#plot_heatmap_individual
-		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = ANNOTATIONS, norm = ["RPM","SI"], species = ["Scer","Spom"]),
+		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), norm = ["RPM","SI"], species = ["Scer","Spom"]),
+		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), norm = ["RPM","SI"], species = ["Scer"]),
 		#deeptools_matrix_group
-		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#plot_heatmap_group
-		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#macs2
 		#expand("peakcalling/{tsample}-{gtype}_{csample}-{gtype}_peaks.narrowPeak", tsample = PEAK_TREATMENT, csample = uniq(PEAK_CONTROL), gtype = uniq(GTYPE)),
 		#separate_peaks
 		expand("peakcalling/{species}/{tsample}-{gtype}_{csample}-{gtype}_peaks.narrowPeak", species = ["Scer","Spom"], tsample = PEAK_TREATMENT, csample = uniq(PEAK_CONTROL), gtype = uniq(GTYPE)),
 		#gzip_deeptools_matrix_individual
-		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#gzip_deeptools_matrix_group
-		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#multi_metagene
-		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#multi_metagene_divbylib
-		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = ANNOTATIONS, species = ["Scer","Spom"])
+		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"])
 
 #Make a tab separated file with column 1 containing name of lib and column 2 containing the barcode sequence
 rule make_barcode_file:
@@ -333,7 +341,7 @@ rule plot_correlations:
 	output:
 		"plots/correlations/{species}_norm{norm}/{ip}_correlations_{species}_norm{norm}.{type}"
 	params:
-		samplelist = lambda wildcards: names("ip",wildcards.ip),
+		samplelist = lambda wildcards: names(SAMPLES,"ip",wildcards.ip),
 		pcount = 0.1
 	script: "scripts/plotcorr.R"
 #Convert bedgraph to bigwig
@@ -362,12 +370,13 @@ rule deeptools_matrix_individual:
 		sort = lambda wildcards: config["annotations"][wildcards.annotation]["sort"],
 		sortusing = lambda wildcards: config["annotations"][wildcards.annotation]["sortby"],
 		binstat = lambda wildcards: config["annotations"][wildcards.annotation]["binstat"],
-		bodylength = lambda wildcards: config["annotations"][wildcards.annotation]["bodylength"]
+		bodylength = lambda wildcards: config["annotations"][wildcards.annotation]["bodylength"],
+		nan = lambda wildcards: config["annotations"][wildcards.annotation]["nan_afterend"]
 	threads: config["threads"]
 	log: "logs/deeptools_matrix/{sample}_norm{norm}_{annotation}.log"
 	run:
 		if config["annotations"][wildcards.annotation]["reference_point"]=="y":
-			shell("(computeMatrix reference-point -R {input.annotation} -S {input.bigwig} --referencePoint {params.refpoint} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} --nanAfterEnd) &> {log}")
+			shell("(computeMatrix reference-point -R {input.annotation} -S {input.bigwig} --referencePoint {params.refpoint} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} {params.nan}) &> {log}")
 		else:
 			shell("(computeMatrix scale-regions -R {input.annotation} -S {input.bigwig} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} --regionBodyLength {params.bodylength}) &> {log}")
 # Generate a heatmap using the deeptools matrix
@@ -387,7 +396,7 @@ rule plot_heatmap_individual:
 rule deeptools_matrix_group:
 	input:
 		annotation = lambda wildcards: "genome/annotations/"+ wildcards.species +"_" + config["annotations"][wildcards.annotation]["bed_suffix"] + ".bed",
-		bigwig = lambda wildcards: expand("bigwigfiles/{species}_norm{norm}/{sample}_{species}_norm{norm}.bw", sample = names("ip",wildcards.ip), species = wildcards.species, norm=wildcards.norm)
+		bigwig = lambda wildcards: expand("bigwigfiles/{species}_norm{norm}/{sample}_{species}_norm{norm}.bw", sample = names(SAMPLES,"ip",wildcards.ip), species = wildcards.species, norm=wildcards.norm)
 	output:
 		dtfile = "matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz",
 		matrix = temp("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv")
@@ -399,12 +408,13 @@ rule deeptools_matrix_group:
 		sort = lambda wildcards: config["annotations"][wildcards.annotation]["sort"],
 		sortusing = lambda wildcards: config["annotations"][wildcards.annotation]["sortby"],
 		binstat = lambda wildcards: config["annotations"][wildcards.annotation]["binstat"],
-		bodylength = lambda wildcards: config["annotations"][wildcards.annotation]["bodylength"]
+		bodylength = lambda wildcards: config["annotations"][wildcards.annotation]["bodylength"],
+		nan = lambda wildcards: config["annotations"][wildcards.annotation]["nan_afterend"]
 	threads: config["threads"]
 	log: "logs/deeptools_matrix/{ip}_norm{norm}_{annotation}.log"
 	run:
 		if config["annotations"][wildcards.annotation]["reference_point"]=="y":
-			shell("(computeMatrix reference-point -R {input.annotation} -S {input.bigwig} --referencePoint {params.refpoint} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} --nanAfterEnd) &> {log}")
+			shell("(computeMatrix reference-point -R {input.annotation} -S {input.bigwig} --referencePoint {params.refpoint} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} {params.nan}) &> {log}")
 		else:
 			shell("(computeMatrix scale-regions -R {input.annotation} -S {input.bigwig} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} --regionBodyLength {params.bodylength}) &> {log}")
 #Generate heatmap using plot_heatmap
@@ -424,8 +434,8 @@ rule plot_heatmap_group:
 #Makes the assumption that fragment sizes for replicate samples are approximately equal, so extends reads by fragment size of replicate 1
 rule macs2:
 	input:
-		treatment = lambda wildcards: expand("alignment/{sample}.bam", sample = names("group",wildcards.tgroup)),
-		control = lambda wildcards: expand("alignment/{sample}.bam", sample = names("group",wildcards.cgroup)),
+		treatment = lambda wildcards: expand("alignment/{sample}.bam", sample = names(SAMPLES,"group",wildcards.tgroup)),
+		control = lambda wildcards: expand("alignment/{sample}.bam", sample = names(SAMPLES,"group",wildcards.cgroup)),
 		chrsizes = lambda wildcards: "genome/combined_genome.chrom.sizes",
 		fragsize = "cross_correlation/fragment_length-{tgroup}-1.txt"
 	output:
@@ -500,7 +510,7 @@ rule multi_metagene:
 #Plot metagenes for all samples normalizing to input or another IP
 rule multi_metagene_divbylib:
 	input:
-		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = ANNOTATIONS, species = ["Scer","Spom"]),
+		expand("matrix/group_ip_melted/{{annotation}}/{{species}}_norm{{norm}}/{ip}_{{species}}_norm{{norm}}_{{annotation}}_meltedmat.txt", ip = uniq(IP)),
 		mat_ip = "matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt"
 	output:
 		"dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt"
