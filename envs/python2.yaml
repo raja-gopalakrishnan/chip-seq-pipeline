@@ -1,0 +1,8 @@
+name: python2
+channels:
+    - bioconda
+    - r
+dependencies:
+    - macs2=2.1.1.20160309 
+    - r
+
