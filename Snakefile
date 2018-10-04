@@ -36,6 +36,9 @@ def names(dictionary, attribute, value):
 localrules: all,
    	    make_barcode_file
 
+wildcard_constraints:
+    sample="[a-zA-Z0-9-]+"
+
 rule all:
 	input:
 		#make_barcode_file
@@ -67,7 +70,7 @@ rule all:
 		expand("reads_stats/{readtype}_spikein_proportion_all.txt", readtype = ["actual","apparent"]),
 		expand("plots/{readtype}_spike_in_proportion/{readtype}_spike_in_proportion_{ip}.{type}",readtype = ["actual","apparent"],ip=uniq(IP), type = config["imagetype"]["plot_spikein_percentage"]),
 		#make_windows
-		expand("bedfiles/{species}_100bp_windows.bed", species = ["Scer","Spom"]),
+		expand("bedfiles/{species}_{num}bp_windows.bed", num = ["100","20"], species = ["Scer","Spom"]),
 		#get_window_coverage
 		expand("bedgraphs/100bp_windows/{species}_norm{norm}/{sample}_100bp_windows_{species}_norm{norm}.bdg", sample = SAMPLES, species = ["Scer","Spom"], norm = ["RPM", "SI"]),
 		#merge_bedgraphs
@@ -103,7 +106,15 @@ rule all:
 		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#multi_metagene_divbylib
 		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"])
+		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
+		#metagene_bin_length_fpkm
+		expand("dummyfile/metagene_bin_length_fpkm_{sample}_{species}_norm{norm}_{annotation}.txt", sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer"], norm = ["RPM", "SI"], annotation = names(ANNOTATIONS,"length_fpkm","y")),
+		#bin_bedgraphs
+		expand("differential_analysis/lib_norm/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_20bp.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
+		#map_to_gene
+		expand("differential_analysis/gene_coverage/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_gene_coverage.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
+		#mean_replicates
+		expand("differential_analysis/mean_replicates/{species}_norm{norm}/{ip_gtype}_div_controlLib_{species}_norm{norm}_combined_gene_coverage.bdg", norm = ["RPM", "SI"], species = ["Scer","Spom"], ip_gtype = uniq([v["group"] for k,v in SAMPLES.items() if v["ip"]!= "input"]))
 
 #Make a tab separated file with column 1 containing name of lib and column 2 containing the barcode sequence
 rule make_barcode_file:
@@ -309,9 +320,11 @@ rule make_windows:
 	input:
 		"genome/{species}.tsv"
 	output:
-		"bedfiles/{species}_100bp_windows.bed"
+		hundred = "bedfiles/{species}_100bp_windows.bed",
+		twenty = "bedfiles/{species}_20bp_windows.bed"
 	shell:"""
-	bedtools makewindows -g {input} -w 100 | sort -k1,1 -k2,2n - > {output}
+	bedtools makewindows -g {input} -w 100 | sort -k1,1 -k2,2n - > {output.hundred}
+	bedtools makewindows -g {input} -w 20 | sort -k1,1 -k2,2n - > {output.twenty}
 	"""
 #Get a bedgraph of coverage by mapping to a regularly binned genome file. This can then by used for correlations and input normalizations.
 rule get_window_coverage:
@@ -528,3 +541,74 @@ rule multi_metagene_divbylib:
 		imagetype = config["imagetype"]["multi_metagene_divbylib"],
 		outdir = "plots/metagene/group_ip_div_lib/{annotation}/{species}_norm{norm}/"
 	script: "scripts/metagene_divbylib.R"
+#Plot metagenes for all samples binning by gene length
+rule metagene_bin_length_fpkm:
+	input:
+		expand("matrix/{{annotation}}/individual/{{species}}_norm{{norm}}/{sample}_{{species}}_norm{{norm}}_{{annotation}}.mat.gz", sample = SAMPLES),
+		mat_ip = "matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz"
+	output:
+		"dummyfile/metagene_bin_length_fpkm_{sample}_{species}_norm{norm}_{annotation}.txt"
+	params:
+		prefix = "matrix/{annotation}/individual/{species}_norm{norm}/",
+		suffix = "_{species}_norm{norm}_{annotation}.mat.gz",
+		control = lambda wildcards: config["normalizations"][config["samples"][wildcards.sample]["ip"]],
+		gtype = lambda wildcards: config["samples"][wildcards.sample]["gtype"],
+		replicate = lambda wildcards: config["samples"][wildcards.sample]["replicate"],
+		ip = lambda wildcards: config["samples"][wildcards.sample]["ip"],
+		binsize = lambda wildcards: config["annotations"][wildcards.annotation]["binsize"],
+		upstream = lambda wildcards: config["annotations"][wildcards.annotation]["upstream"],
+		downstream = lambda wildcards: config["annotations"][wildcards.annotation]["downstream"],
+		bodylength = lambda wildcards: config["annotations"][wildcards.annotation]["bodylength"],
+		align = lambda wildcards: config["annotations"][wildcards.annotation]["refpoint"],
+		length_outpath = "plots/metagene/length_div_lib/{annotation}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_div_",
+		fpkm_outpath = "plots/metagene/fpkm_div_lib/{annotation}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_div_",
+		imagetype = config["imagetype"]["metagene_bin_length_fpkm"],
+		length_outdir = "plots/metagene/length_div_lib/{annotation}/{species}_norm{norm}/",
+		fpkm_outdir = "plots/metagene/fpkm_div_lib/{annotation}/{species}_norm{norm}/",
+		length_bins = config["length_bins"],
+		fpkm_bins = config["fpkm_bins"],
+		fpkm_table = "genome/annotations/All_pol2genes_length_fpkm.txt"
+	script: "scripts/metagene_bin_length_fpkm.R"
+#Obtain 20 bp bins of samples
+rule bin_bedgraphs:
+	input:
+		bdg = "bedgraphs/{species}_norm{norm}/{sample}_{species}_norm{norm}.bdg",
+		bedfile = "bedfiles/{species}_20bp_windows.bed"
+	output:
+		"differential_analysis/20bp_windows/{species}_norm{norm}/{sample}_{species}_norm{norm}_20bp.bdg"
+	shell:"""
+	bedtools map -a {input.bedfile} -b {input.bdg} -c 4 -o mean -null 0 | sort -k1,1 -k2,2n - > {output}
+	"""
+#Normalize the IP libraries to their control
+rule bedgraphs_div_by_lib:
+	input:
+		expand("differential_analysis/20bp_windows/{{species}}_norm{{norm}}/{sample}_{{species}}_norm{{norm}}_20bp.bdg", sample = SAMPLES),
+		bdg = "differential_analysis/20bp_windows/{species}_norm{norm}/{sample}_{species}_norm{norm}_20bp.bdg"
+	output:
+		"differential_analysis/lib_norm/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_20bp.bdg"
+	params:
+		control_ip = lambda wildcards: config["comparisons"][SAMPLES[wildcards.sample]["ip"]],
+		gtype = lambda wildcards: SAMPLES[wildcards.sample]["gtype"],
+		replicate = lambda wildcards: SAMPLES[wildcards.sample]["replicate"]
+	shell:"""
+	control_file="differential_analysis/20bp_windows/{wildcards.species}_norm{wildcards.norm}/{params.control_ip}-{params.gtype}-{params.replicate}_{wildcards.species}_norm{wildcards.norm}_20bp.bdg"
+	paste {input.bdg} $control_file | awk 'BEGIN{{FS=OFS="\t"}}{{print $1, $2, $3, ($4+1)/($8+1)}}' > {output}
+	"""
+#Get average coverage of each normalized library over a gene
+rule map_to_gene:
+	input:
+		"differential_analysis/lib_norm/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_20bp.bdg"
+	output: 
+		"differential_analysis/gene_coverage/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_gene_coverage.bdg"
+	shell:"""
+	bedtools map -a <(sort -k1,1 -k2,2n genome/annotations/Scer_transcripts_w_verifiedORFs.bed) -b {input} -c 4 -o mean -null 0 > {output}
+	"""
+# Take mean of replicates for gene coverage
+rule mean_replicates:
+	input:
+		lambda wildcards: expand("differential_analysis/gene_coverage/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_gene_coverage.bdg", sample = names(SAMPLES,"group",wildcards.ip_gtype), species = wildcards.species, norm = wildcards.norm)
+	output:
+		"differential_analysis/mean_replicates/{species}_norm{norm}/{ip_gtype}_div_controlLib_{species}_norm{norm}_combined_gene_coverage.bdg"
+	shell:"""
+	paste {input} | awk 'BEGIN{{FS=OFS="\t"}}{{print $1, $2, $3, $4, ($7+$14)/2}}' > {output}
+	"""
