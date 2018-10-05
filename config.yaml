@@ -1,5 +1,6 @@
 #Specify names and barcodes for each sample
 #Important to follow the ip-gtype-replicate naming system for the script to work
+#Replicate must be a number. IP must be a single word without any hyphens.
 samples:
     ha-wt-1 :   
       barcode: "ATCACG"
@@ -322,10 +323,15 @@ imagetype:
   plot_heatmap: "png"
   multi_metagene: "png"
   multi_metagene_divbylib: "png"
+  metagene_bin_length_fpkm: "png"
 
 #Plots excluding these samples will also be made in the mentioned rules
 exclude:
   multi_metagene_divbylib: "spt6"
+
+#Number of groups to divide genes into for length and fpkm binning
+length_bins: 5
+fpkm_bins: 5
 
 normalizations:
   ha: 
@@ -343,8 +349,16 @@ normalizations:
     - ha
   h3:
     - input
-  
 
+comparisons:
+  #ha: input
+  ha: pol2
+  pol2: input
+  h3k36me3: h3
+  h3k36me2: h3
+  h3: input
+    
+#Annotation details for plots that have to be made for S. cerevisiae and S. pombe
 annotations:
   align-tss:
     refpoint: "TSS"
@@ -352,39 +366,106 @@ annotations:
     downstream: 4000
     binstat: "mean"
     binsize: 20
-    nan_afterend: y
+    nan_afterend: "--nanAfterEnd"
     sort: "ascend"
     sortby: "region_length"
     missingdatacolor: 1
     reference_point: y
     bodylength: 0
-    bed_suffix: polIItranscripts-adjustedTSS
+    bed_suffix: "polIItranscripts-adjustedTSS"
+    species: "all"
+    length_fpkm: "y"
   align-tes:
     refpoint: "TES"
     upstream: 4000
     downstream: 300
     binstat: "mean"
     binsize: 20
-    nan_afterend: y
+    nan_afterend: "--nanAfterEnd"
     sort: "ascend"
     sortby: "region_length"
     missingdatacolor: 1 
     reference_point: y
     bodylength: 0
-    bed_suffix: polIItranscripts-adjustedTSS
+    bed_suffix: "polIItranscripts-adjustedTSS"
+    species: "all"
+    length_fpkm: "y"
   align-tss-tes:
     refpoint: "TSS-TES"
     upstream: 500
     downstream: 500
     binstat: "mean"
     binsize: 20
-    nan_afterend: y
+    nan_afterend: ""
     sort: "ascend"
     sortby: "region_length"
     missingdatacolor: 1 
     reference_point: n
     bodylength: 1000
-    bed_suffix: polIItranscripts-adjustedTSS
+    bed_suffix: "polIItranscripts-adjustedTSS"
+    species: "all"
+    length_fpkm: "y"
+  align-itss-ov37:
+    refpoint: "center"
+    upstream: 500
+    downstream: 500
+    binstat: "mean"
+    binsize: 20
+    nan_afterend: ""
+    sort: "ascend"
+    sortby: "region_length"
+    missingdatacolor: 1 
+    reference_point: y
+    bodylength: 0
+    bed_suffix: "ov-spt6-1004-37C-v-ov-WT-37C-results-spikenorm-up-intragenic"
+    species: "Scer"
+    length_fpkm: "n"
+    #Original file - /n/groups/winston/jc459/intragenic/other-datasets/viktorovskaya-tss-seq/diff_exp/ov-spt6-1004-37C-v-ov-WT-37C/intragenic/ov-spt6-1004-37C-v-ov-WT-37C-results-spikenorm-up-intragenic.bed
+  align-coding-nov-tss:
+    refpoint: "TSS"
+    upstream: 300
+    downstream: 4000
+    binstat: "mean"
+    binsize: 20
+    nan_afterend: "--nanAfterEnd"
+    sort: "ascend"
+    sortby: "region_length"
+    missingdatacolor: 1
+    reference_point: y
+    bodylength: 0
+    bed_suffix: "transcripts_w_verifiedORFs-nonoverlapping"
+    species: "Scer"
+    length_fpkm: "y"
+  align-coding-nov-tes:
+    refpoint: "TES"
+    upstream: 4000
+    downstream: 300
+    binstat: "mean"
+    binsize: 20
+    nan_afterend: "--nanAfterEnd"
+    sort: "ascend"
+    sortby: "region_length"
+    missingdatacolor: 1 
+    reference_point: y
+    bodylength: 0
+    bed_suffix: "transcripts_w_verifiedORFs-nonoverlapping"
+    species: "Scer"
+    length_fpkm: "y"
+  align-coding-nov-tss-tes:
+    refpoint: "TSS-TES"
+    upstream: 500
+    downstream: 500
+    binstat: "mean"
+    binsize: 20
+    nan_afterend: ""
+    sort: "ascend"
+    sortby: "region_length"
+    missingdatacolor: 1 
+    reference_point: n
+    bodylength: 1000
+    bed_suffix: "transcripts_w_verifiedORFs-nonoverlapping"
+    species: "Scer"
+    length_fpkm: "y"
 
 #Note that all the items for this dictionary need to be the same
 callpeaks:
@@ -397,3 +478,9 @@ callpeaks:
 macs2:
   fdr: 0.05
   env_name: python2
+
+browser_shots:
+  ADH1: minus
+  STE11: plus
+  TDH3: minus
+  RIX1: plus
