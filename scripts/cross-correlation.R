@@ -14,12 +14,12 @@ write.table(frag_size, snakemake@output[["length"]], quote=F, row.names=F, col.n
 tag.shift = frag_size/2
 
 #Make plot showing cross-correlation profile
-p = {
-	par(mar = c(3.5,3.5,1.0,0.5), mgp = c(2,0.65,0), cex = 0.8)
-	plot(binding.characteristics$cross.correlation,type='l',xlab="Strand shift",ylab="Cross-correlation", main="");
-	abline(v=binding.characteristics$peak$x,lty=2,col=2)
-}
-ggsave(filename=snakemake@output[["png"]], plot = p,width=5, height=5, units="in")
+png(snakemake@output[["png"]], width = 5, height = 5, units = "in", res= 300)
+par(mar = c(3.5,3.5,1.0,0.5), mgp = c(2,0.65,0), cex = 0.8)
+plot(binding.characteristics$cross.correlation,type='l',xlab="Strand shift",ylab="Cross-correlation", main="");
+abline(v=binding.characteristics$peak$x,lty=2,col=2)
+dev.off()
+
 #Remove positions with abnormally high number of reads as it probably indicates some technical bias (threshold = 10-fold)
 #Threshold fold-over background density above which the position is capped to the maximum statistically likely given local tag density = 4
 chip.data=select.informative.tags(chip.data)

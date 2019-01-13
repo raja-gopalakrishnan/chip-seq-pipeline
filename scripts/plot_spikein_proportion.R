@@ -30,14 +30,14 @@ plot_prop = function(index)
 	z = filter(melt_tab, ip==IP)
 	#Make the plot
 	g = ggplot(z,aes(x=sample, y=value, fill=variable)) +geom_bar(stat = "identity")+theme_bw()+
-		  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-		        axis.title.x = element_text(size = 50), axis.title.y = element_blank(),
-		        axis.text.x = element_text(size = 60), axis.text.y = element_text(size=60),
-		        legend.text = element_text(size=50),legend.key.size = unit(7,"lines"),
-		        legend.title = element_blank())+
-		  scale_fill_manual(values=c(rgb(252/255,176/255,64/255),rgb(39/255,34/255,98/255)))+
-		  scale_y_continuous(expand=c(0,0), breaks = c(0.25,0.5,0.75,1))+
-		  ylab("Proportion")+coord_flip()
+  	  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  	        axis.title.x = element_text(size = 20), axis.title.y = element_blank(),
+  	        axis.text.x = element_text(size = 25), axis.text.y = element_text(size=25),
+  	        legend.text = element_text(size=20),legend.key.size = unit(2,"lines"),
+  	        legend.title = element_blank())+
+  	  scale_fill_manual(values=c(rgb(252/255,176/255,64/255),rgb(39/255,34/255,98/255)))+
+  	  scale_y_continuous(expand=c(0,0), breaks = c(0.25,0.5,0.75,1))+
+  	  ylab("Proportion")+coord_flip()
 
 	#Save the plot
 	ggsave(filename = snakemake@output[["ip_plots"]][index], plot=g,width=8.3, height=5, units="in")
