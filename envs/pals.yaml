@@ -1,0 +1,11 @@
+name: pals
+channels:
+  - conda-forge
+  - r
+  - defaults
+dependencies:
+  - r-base=3.4.1=4
+  - r-dplyr=0.7.6=r341h9d2a408_1
+  - r-ggplot2=3.0.0=r341h6115d3f_1
+  - r-pals=1.5=r341h6115d3f_0
+  - r-tidyverse=1.2.1=r341h6115d3f_1

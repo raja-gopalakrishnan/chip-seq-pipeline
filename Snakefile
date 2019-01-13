@@ -37,57 +37,60 @@ localrules: all,
    	    make_barcode_file
 
 wildcard_constraints:
-    sample="[a-zA-Z0-9-]+"
+    sample="[a-zA-Z0-9-]+",
+    species="[a-zA-Z0-9-]+",
+    annotation="[a-zA-Z0-9-]+"
 
 rule all:
 	input:
 		#make_barcode_file
-		"barcodes.tsv",
+		#"barcodes.tsv",
 		#fastqc_raw
 		"qual_ctrl/raw",
 		#fastqc_processed
 		expand("qual_ctrl/trimmed-{sample}", sample=SAMPLES),
 		#bowtie
-		expand("alignment/fastq/unaligned-{sample}.fastq.gz", sample=SAMPLES),
+		#expand("alignment/fastq/unaligned-{sample}.fastq.gz", sample=SAMPLES),
 		expand("alignment/fastq/aligned-{sample}.fastq.gz", sample=SAMPLES),
 		#gzip_loose_fastq
-		expand("fastq/trimmed/{sample}.trimmed.fastq.gz", sample=SAMPLES),
+		#expand("fastq/trimmed/{sample}.trimmed.fastq.gz", sample=SAMPLES),
 		#samtools_index
-		expand("alignment/{sample}{species}.bam.bai", sample = SAMPLES, species = ["","_Scer","_Spom"]),
+		#expand("alignment/{sample}.bam.bai", sample = SAMPLES),
+		#expand("alignment/{sample}_{species}.bam.bai", sample = SAMPLES, species = ["Scer","Spom"]),
 		#bam_separate_species
-		expand("alignment/{sample}_{species}.bam", sample = SAMPLES, species = ["Scer", "Spom"]),
+		#expand("alignment/{sample}_{species}.bam", sample = SAMPLES, species = ["Scer", "Spom"]),
 		#cross_correlation
-		expand("cross_correlation/fragment_length-{ip}-{gtype}-{replicate}.txt", ip=uniq(IP), gtype=uniq(GTYPE), replicate=uniq(REPLICATE)),
+		expand("cross_correlation/fragment_length-{sample}.txt", sample=SAMPLES),
 		#bowtie_summary
 		"alignment/bowtie_read_number_summary.txt",
 		#generate_coverage
-		expand("wigfiles/{species}/{sample}_{species}_unnormalized.wig", sample = SAMPLES, species = ["Scer","Spom"]),
+		#expand("wigfiles/{species}/{sample}_{species}_unnormalized.wig", sample = SAMPLES, species = ["Scer","Spom"]),
 		#wig_to_bedgraph
 		#expand("bedgraphs/{sample}_{species}.bdg", sample = SAMPLES, species = ["Scer","Spom"]),
 		#normalize
-		expand("bedgraphs/{species}_normSI/{sample}_{species}_normSI.bdg", sample = SAMPLES, species = ["Scer","Spom"]),
+		#expand("bedgraphs/{species}_normSI/{sample}_{species}_normSI.bdg", sample = SAMPLES, species = ["Scer","Spom"]),
 		#plot_spikein_percentage
 		expand("reads_stats/{readtype}_spikein_proportion_all.txt", readtype = ["actual","apparent"]),
 		expand("plots/{readtype}_spike_in_proportion/{readtype}_spike_in_proportion_{ip}.{type}",readtype = ["actual","apparent"],ip=uniq(IP), type = config["imagetype"]["plot_spikein_percentage"]),
 		#make_windows
-		expand("bedfiles/{species}_{num}bp_windows.bed", num = ["100","20"], species = ["Scer","Spom"]),
+		#expand("bedfiles/{species}_{num}bp_windows.bed", num = ["100","20"], species = ["Scer","Spom"]),
 		#get_window_coverage
-		expand("bedgraphs/100bp_windows/{species}_norm{norm}/{sample}_100bp_windows_{species}_norm{norm}.bdg", sample = SAMPLES, species = ["Scer","Spom"], norm = ["RPM", "SI"]),
+		#expand("bedgraphs/100bp_windows/{species}_norm{norm}/{sample}_100bp_windows_{species}_norm{norm}.bdg", sample = SAMPLES, species = ["Scer","Spom"], norm = ["RPM", "SI"]),
 		#merge_bedgraphs
-		expand("bedgraphs/merge_bedgraphs/all_100bp_windows_{species}_norm{norm}.bdg", species = ["Scer","Spom"], norm=["RPM","SI"]),
+		#expand("bedgraphs/merge_bedgraphs/all_100bp_windows_{species}_norm{norm}.bdg", species = ["Scer","Spom"], norm=["RPM","SI"]),
 		#plot_correlations
 		expand("plots/correlations/{species}_norm{norm}/{ip}_correlations_{species}_norm{norm}.{type}", ip=uniq(IP), type=config["imagetype"]["plot_correlations"], species=["Scer","Spom"], norm=["RPM", "SI"]),
 		#bedgraph_to_bigwig
-		expand("bigwigfiles/{species}_norm{norm}/{sample}_{species}_norm{norm}.bw", sample = SAMPLES, norm=["RPM","SI"], species = ["Scer","Spom"]),
+		#expand("bigwigfiles/{species}_norm{norm}/{sample}_{species}_norm{norm}.bw", sample = SAMPLES, norm=["RPM","SI"], species = ["Scer","Spom"]),
 		#deeptools_matrix_individual
-		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
+		#expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		#expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#plot_heatmap_individual
 		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), norm = ["RPM","SI"], species = ["Scer","Spom"]),
 		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), norm = ["RPM","SI"], species = ["Scer"]),
 		#deeptools_matrix_group
-		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
+		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#plot_heatmap_group
 		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
 		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
@@ -95,30 +98,33 @@ rule all:
 		#expand("peakcalling/{tsample}-{gtype}_{csample}-{gtype}_peaks.narrowPeak", tsample = PEAK_TREATMENT, csample = uniq(PEAK_CONTROL), gtype = uniq(GTYPE)),
 		#separate_peaks
 		expand("peakcalling/{species}/{tsample}-{gtype}_{csample}-{gtype}_peaks.narrowPeak", species = ["Scer","Spom"], tsample = PEAK_TREATMENT, csample = uniq(PEAK_CONTROL), gtype = uniq(GTYPE)),
-		#gzip_deeptools_matrix_individual
-		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
+		#gzip_deeptools_matrix
+		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"], folder = ["individual"]),
+		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"], folder = ["individual"]),
+		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"], folder = ["group_ip"]),
+		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"], folder = ["group_ip"]),
 		#gzip_deeptools_matrix_group
-		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
+		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#multi_metagene
-		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		expand("matrix/group_ip_melted/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_meltedmat.txt", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
+		expand("plots/metagene/group_ip_div_none/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_metagene." + config["imagetype"]["multi_metagene"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
+		expand("plots/metagene/group_ip_div_none/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_metagene." + config["imagetype"]["multi_metagene"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#multi_metagene_divbylib
 		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
 		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#metagene_bin_length_fpkm
 		expand("dummyfile/metagene_bin_length_fpkm_{sample}_{species}_norm{norm}_{annotation}.txt", sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer"], norm = ["RPM", "SI"], annotation = names(ANNOTATIONS,"length_fpkm","y")),
 		#bin_bedgraphs
-		expand("differential_analysis/lib_norm/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_20bp.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
+		#expand("differential_analysis/lib_norm/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_20bp.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
 		#map_to_gene
-		expand("differential_analysis/gene_coverage/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_gene_coverage.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
+		#expand("differential_analysis/gene_coverage/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_gene_coverage.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
 		#mean_replicates
 		expand("differential_analysis/mean_replicates/{species}_norm{norm}/{ip_gtype}_div_controlLib_{species}_norm{norm}_combined_gene_coverage.bdg", norm = ["RPM", "SI"], species = ["Scer","Spom"], ip_gtype = uniq([v["group"] for k,v in SAMPLES.items() if v["ip"]!= "input"]))
 
 #Make a tab separated file with column 1 containing name of lib and column 2 containing the barcode sequence
 rule make_barcode_file:
 	output:
+		#"barcodes.fa"
 		"barcodes.tsv"
 	params:
 		bc = config["samples"]
@@ -126,6 +132,7 @@ rule make_barcode_file:
 		with open(output[0],"w") as f:
 			for x in params.bc:
 				f.write('\t'.join((x,params.bc[x]["barcode"])) + '\n')
+				#f.write('\n'.join((">"+x , params.bc[x]["barcode"])) + '\n')
 #fastqc analysis				
 rule fastqc_raw:
 	input:
@@ -149,6 +156,7 @@ rule demultiplex:
 	params:
 		mismatch = config["demultiplex"]["mismatch"]
 	shell:"""
+	#(flexbar -r {input.fastq} -b {input.barcode} --barcode-trim-end LTAIL --barcode-unassigned -t fastq/sample -n 4 --zip-output GZ --min-read-length 5) &> {log}
 	(fastq-multx -B {input.barcode} -b {input.fastq} -m {params.mismatch} -o fastq/%.fastq.gz) &> {log}
 	"""
 #Cutadapt - trim 1 base from 5' end of every file
@@ -156,6 +164,7 @@ rule demultiplex:
 rule cutadapt:
 	input:
 		"fastq/{sample}.fastq.gz"
+		#"fastq/{sample}.fastq.gz"
 	output:
 		temp("fastq/trimmed/{sample}.trimmed.fastq")
 	params:
@@ -210,12 +219,14 @@ rule bam_separate_species:
         "alignment/{sample}.bam",
         "alignment/{sample}.bam.bai"
     output:
-        "alignment/{sample}_{species}.bam"
+        bam = "alignment/{sample}_{species}.bam",
+        ibam = "alignment/{sample}_{species}.bam.bai"
     params:
     	"genome/combined_genome.chrom.sizes"
     log: "logs/bam_separate_species/bam_separate_species-{sample}_{species}.log"
     shell: """
-        (samtools view -b {input} $(grep {wildcards.species} {params} | awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') > {output}) &> {log}
+        (samtools view -b {input} $(grep {wildcards.species} {params} | awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') > {output.bam}
+        samtools index -b {output.bam}) &> {log}
         """
 #Gather summary statistics for alignment
 rule bowtie_summary:
@@ -231,7 +242,8 @@ rule samtools_index:
 		"alignment/{sample}.bam"
 	output:
 		"alignment/{sample}.bam.bai"
-	log: "logs/samtools_index/samtools_index-{sample}.log"
+	log: 
+		"logs/samtools_index/samtools_index-{sample}.log",
 	shell:"""
 	(samtools index -b {input}) &> {log}
 	"""
@@ -255,16 +267,13 @@ rule gzip_loose_fastq:
 # Install r libraries - spp, Rsamtools and fastcluster prior to running this job
 rule cross_correlation:
 	input:
-		chip_bam = "alignment/{ip}-{gtype}-{replicate}.bam",
-		control_bam = "alignment/input-{gtype}-{replicate}.bam"
+		chip_bam = "alignment/{sample}.bam",
+		control_bam = lambda wildcards: "alignment/"+ config["control_gtype"] +"-"+ config["samples"][wildcards.sample]["gtype"] + "-" + str(config["samples"][wildcards.sample]["replicate"]) + ".bam"
 	output:
-		length = "cross_correlation/fragment_length-{ip}-{gtype}-{replicate}.txt",
-		png = "plots/cross_correlation/cross_correlation-{ip}-{gtype}-{replicate}.png",
-		read_counts = "reads_stats/{ip}-{gtype}-{replicate}_actualreadcounts.txt",
-		apparent_read_counts = "reads_stats/{ip}-{gtype}-{replicate}_apparentreadcounts.txt"
-	wildcard_constraints:
-		ip = "[a-z0-9]+",
-		replicate = "\d+"
+		length = "cross_correlation/fragment_length-{sample}.txt",
+		png = "plots/cross_correlation/cross_correlation-{sample}.png",
+		read_counts = "reads_stats/{sample}_actualreadcounts.txt",
+		apparent_read_counts = "reads_stats/{sample}_apparentreadcounts.txt"
 	script:
 		"scripts/cross-correlation.R"
 #Make coverage wigfile
@@ -393,18 +402,39 @@ rule deeptools_matrix_individual:
 		else:
 			shell("(computeMatrix scale-regions -R {input.annotation} -S {input.bigwig} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} --regionBodyLength {params.bodylength}) &> {log}")
 # Generate a heatmap using the deeptools matrix
+#rule plot_heatmap_individual:
+#	input: 
+#		dtfile = "matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz"
+#	output:
+#		plot = "plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"]
+#	params:
+#		sort = lambda wildcards: config["annotations"][wildcards.annotation]["sort"],
+#		sortusing = lambda wildcards: config["annotations"][wildcards.annotation]["sortby"],
+#		missingdatacolor = lambda wildcards: config["annotations"][wildcards.annotation]["missingdatacolor"]
+#	shell:"""
+#	plotHeatmap -m {input.dtfile} -out {output.plot} --sortRegions {params.sort} --sortUsing {params.sortusing} --missingDataColor {params.missingdatacolor}
+#	"""
 rule plot_heatmap_individual:
 	input: 
-		dtfile = "matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz"
+		dtfile = "matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz"
 	output:
 		plot = "plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"]
 	params:
-		sort = lambda wildcards: config["annotations"][wildcards.annotation]["sort"],
-		sortusing = lambda wildcards: config["annotations"][wildcards.annotation]["sortby"],
-		missingdatacolor = lambda wildcards: config["annotations"][wildcards.annotation]["missingdatacolor"]
-	shell:"""
-	plotHeatmap -m {input.dtfile} -out {output.plot} --sortRegions {params.sort} --sortUsing {params.sortusing} --missingDataColor {params.missingdatacolor}
-	"""
+		gtypes = lambda wildcards: config["samples"][wildcards.sample]["gtype"],
+		#prefix = "../matrix/{annotation}/individual/{species}_norm{norm}/",
+        #suffix = "_{species}_norm{norm}_{annotation}.tsv.gz",
+        #control = lambda wildcards: config["comparisons"][wildcards.ip],       
+		binsize = lambda wildcards: config["annotations"][wildcards.annotation]["binsize"],
+		upstream = lambda wildcards: config["annotations"][wildcards.annotation]["upstream"],
+		downstream = lambda wildcards: config["annotations"][wildcards.annotation]["downstream"],
+		bodylength = lambda wildcards: config["annotations"][wildcards.annotation]["bodylength"],
+		align = lambda wildcards: config["annotations"][wildcards.annotation]["refpoint"],
+		#outpath = "plots/heatmaps/{ip}_{species}_norm{norm}_{annotation}_div_",
+		#dirpath = "plots/heatmaps/",
+		imagetype = config["imagetype"]["metagene_bin_length_fpkm"]
+	conda:
+		"envs/pals.yaml"
+	script: "scripts/heatmap_nonorm.R"
 # Generate matrices for plotting heatmaps by IP
 rule deeptools_matrix_group:
 	input:
@@ -490,19 +520,11 @@ rule separate_peaks:
 	grep {wildcards.species} {input.cntrl_bg} | sed 's/{wildcards.species}_//g' > {output.cntrl_bg}
 	"""
 #Gzip the matrices generated by deeptools
-rule gzip_deeptools_matrix_individual:
+rule gzip_deeptools_matrix:
 	input:
-		"matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv"
+		"matrix/{annotation}/{folder}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv"
 	output:
-		"matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz"
-	shell:"""
-	pigz -f {input}
-	"""
-rule gzip_deeptools_matrix_group:
-	input:
-		"matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv"
-	output:
-		"matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz"
+		"matrix/{annotation}/{folder}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz"
 	shell:"""
 	pigz -f {input}
 	"""
