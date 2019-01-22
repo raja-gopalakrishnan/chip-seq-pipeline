@@ -1,0 +1,52 @@
+__default__:
+    queue : "short"
+    time : 00:15:00
+    n : 1
+    mem : 500M
+    name : "{rule}.{wildcards}"
+    log : "logs/cluster/{rule}.{wildcards}.log"
+    err : "logs/cluster/{rule}.{wildcards}.err"
+
+fastqc_raw:
+    time : 02:00:00
+    mem : 1G
+
+samtools_sort:
+    mem : 2G
+
+cross_correlation:
+    mem : 2G
+
+generate_coverage:
+    mem: 750M
+
+bam_separate_species:
+    mem: 50M
+
+plot_spikein_percentage:
+    mem: 50M
+
+gzip_deeptools_matrix:
+    mem: 50M
+
+get_window_coverage:
+    mem: 50M
+
+wig_to_bedgraph:
+    mem: 50M
+
+bedgraph_to_bigwig:
+    mem: 50M
+
+separate_peaks:
+    mem: 50M
+
+multi_metagene:
+    mem : 4G
+
+multi_metagene_divbylib:
+    mem : 6G
+
+metagene_bin_length_fpkm:
+    mem : 4G
+
