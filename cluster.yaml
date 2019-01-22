@@ -11,6 +11,9 @@ fastqc_raw:
     time : 02:00:00
     mem : 1G
 
+demultiplex:
+    time : 02:00:00
+
 samtools_sort:
     mem : 2G
 
@@ -40,6 +43,9 @@ bedgraph_to_bigwig:
 
 separate_peaks:
     mem: 50M
+
+plot_heatmap_individual:
+    mem : 4G
 
 multi_metagene:
     mem : 4G
