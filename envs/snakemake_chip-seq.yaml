@@ -29,4 +29,5 @@ dependencies:
   - r-reshape2=1.4.2=r3.3.2_0
   - r-stringr=1.1.0=r3.3.2_0
   - r-tidyverse=1.0.0=r3.3.2_0
+  - bioconductor-rsamtools=1.26.1=r3.3.2_0
 
