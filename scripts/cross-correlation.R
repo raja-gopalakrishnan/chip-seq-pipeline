@@ -1,6 +1,7 @@
 library(spp)
 library(ggplot2)
 options(scipen=100)
+library(Rsamtools)
 #Read in bam file
 chip.data = read.bam.tags(snakemake@input[["chip_bam"]])
 control.data = read.bam.tags(snakemake@input[["control_bam"]])
