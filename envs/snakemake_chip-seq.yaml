@@ -32,4 +32,9 @@ dependencies:
   - bioconductor-rsamtools=1.26.1=r3.3.2_0
   - bioconductor-genomeinfodb=1.10.3=r3.3.2_0
   - r-rcurl=1.95_4.8=r3.3.2_0
+  - r-fastcluster=1.1.20=r3.3.2_1
+  - numpy=1.13.3=py36ha12f23b_0
+  - pybigwig=0.3.8=np113py36_0
+  - r-stringi=1.1.2=r3.3.2_0
+  - r-hmisc=4.0_3=r3.3.2_0
 
