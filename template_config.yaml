@@ -407,22 +407,6 @@ annotations:
     bed_suffix: "polIItranscripts-adjustedTSS"
     species: "all"
     length_fpkm: "y"
-  align-itss-ov37:
-    refpoint: "center"
-    upstream: 500
-    downstream: 500
-    binstat: "mean"
-    binsize: 20
-    nan_afterend: ""
-    sort: "ascend"
-    sortby: "region_length"
-    missingdatacolor: 1 
-    reference_point: y
-    bodylength: 0
-    bed_suffix: "ov-spt6-1004-37C-v-ov-WT-37C-results-spikenorm-up-intragenic"
-    species: "Scer"
-    length_fpkm: "n"
-    #Original file - /n/groups/winston/jc459/intragenic/other-datasets/viktorovskaya-tss-seq/diff_exp/ov-spt6-1004-37C-v-ov-WT-37C/intragenic/ov-spt6-1004-37C-v-ov-WT-37C-results-spikenorm-up-intragenic.bed
   align-coding-nov-tss:
     refpoint: "TSS"
     upstream: 300
