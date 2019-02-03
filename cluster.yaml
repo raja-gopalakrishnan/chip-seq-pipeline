@@ -14,6 +14,8 @@ fastqc_raw:
 demultiplex:
     time : 02:00:00
 
+bowtie:
+    time : 00:20:00
 samtools_sort:
     mem : 2G
 
