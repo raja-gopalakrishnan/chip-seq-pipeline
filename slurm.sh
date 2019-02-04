@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH -p priority
-#SBATCH -t 12:00:00
+#SBATCH -t 18:00:00
 #SBATCH --mem-per-cpu=4G
 #SBATCH -n 1
 #SBATCH -e superjob.err
