@@ -43,8 +43,6 @@ wildcard_constraints:
 
 rule all:
 	input:
-		#make_barcode_file
-		#"barcodes.tsv",
 		#fastqc_raw
 		"qual_ctrl/raw",
 		#fastqc_processed
@@ -52,50 +50,21 @@ rule all:
 		#bowtie
 		#expand("alignment/fastq/unaligned-{sample}.fastq.gz", sample=SAMPLES),
 		expand("alignment/fastq/aligned-{sample}.fastq.gz", sample=SAMPLES),
-		#gzip_loose_fastq
-		#expand("fastq/trimmed/{sample}.trimmed.fastq.gz", sample=SAMPLES),
-		#samtools_index
-		#expand("alignment/{sample}.bam.bai", sample = SAMPLES),
-		#expand("alignment/{sample}_{species}.bam.bai", sample = SAMPLES, species = ["Scer","Spom"]),
-		#bam_separate_species
-		#expand("alignment/{sample}_{species}.bam", sample = SAMPLES, species = ["Scer", "Spom"]),
 		#cross_correlation
 		expand("cross_correlation/fragment_length-{sample}.txt", sample=SAMPLES),
 		#bowtie_summary
 		"alignment/bowtie_read_number_summary.txt",
-		#generate_coverage
-		#expand("wigfiles/{species}/{sample}_{species}_unnormalized.wig", sample = SAMPLES, species = ["Scer","Spom"]),
-		#wig_to_bedgraph
-		#expand("bedgraphs/{sample}_{species}.bdg", sample = SAMPLES, species = ["Scer","Spom"]),
-		#normalize
-		#expand("bedgraphs/{species}_normSI/{sample}_{species}_normSI.bdg", sample = SAMPLES, species = ["Scer","Spom"]),
 		#plot_spikein_percentage
 		expand("reads_stats/{readtype}_spikein_proportion_all.txt", readtype = ["actual","apparent"]),
 		expand("plots/{readtype}_spike_in_proportion/{readtype}_spike_in_proportion_{ip}.{type}",readtype = ["actual","apparent"],ip=uniq(IP), type = config["imagetype"]["plot_spikein_percentage"]),
-		#make_windows
-		#expand("bedfiles/{species}_{num}bp_windows.bed", num = ["100","20"], species = ["Scer","Spom"]),
-		#get_window_coverage
-		#expand("bedgraphs/100bp_windows/{species}_norm{norm}/{sample}_100bp_windows_{species}_norm{norm}.bdg", sample = SAMPLES, species = ["Scer","Spom"], norm = ["RPM", "SI"]),
-		#merge_bedgraphs
-		#expand("bedgraphs/merge_bedgraphs/all_100bp_windows_{species}_norm{norm}.bdg", species = ["Scer","Spom"], norm=["RPM","SI"]),
 		#plot_correlations
 		expand("plots/correlations/{species}_norm{norm}/{ip}_correlations_{species}_norm{norm}.{type}", ip=uniq(IP), type=config["imagetype"]["plot_correlations"], species=["Scer","Spom"], norm=["RPM", "SI"]),
-		#bedgraph_to_bigwig
-		#expand("bigwigfiles/{species}_norm{norm}/{sample}_{species}_norm{norm}.bw", sample = SAMPLES, norm=["RPM","SI"], species = ["Scer","Spom"]),
-		#deeptools_matrix_individual
-		#expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		#expand("matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#plot_heatmap_individual
 		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","all"), norm = ["RPM","SI"], species = ["Scer","Spom"]),
 		expand("plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), norm = ["RPM","SI"], species = ["Scer"]),
-		#deeptools_matrix_group
-		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.mat.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#plot_heatmap_group
 		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
 		expand("plots/heatmaps/group_ip/{annotation}_{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
-		#macs2
-		#expand("peakcalling/{tsample}-{gtype}_{csample}-{gtype}_peaks.narrowPeak", tsample = PEAK_TREATMENT, csample = uniq(PEAK_CONTROL), gtype = uniq(GTYPE)),
 		#separate_peaks
 		expand("peakcalling/{species}/{tsample}-{gtype}_{csample}-{gtype}_peaks.narrowPeak", species = ["Scer","Spom"], tsample = PEAK_TREATMENT, csample = uniq(PEAK_CONTROL), gtype = uniq(GTYPE)),
 		#gzip_deeptools_matrix
@@ -103,9 +72,6 @@ rule all:
 		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], sample = SAMPLES, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"], folder = ["individual"]),
 		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"], folder = ["group_ip"]),
 		expand("matrix/{annotation}/{folder}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"], folder = ["group_ip"]),
-		#gzip_deeptools_matrix_group
-		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
-		#expand("matrix/{annotation}/group_ip/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}.tsv.gz", norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#multi_metagene
 		expand("plots/metagene/group_ip_div_none/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_metagene." + config["imagetype"]["multi_metagene"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","all"), species = ["Scer","Spom"]),
 		expand("plots/metagene/group_ip_div_none/{annotation}/{species}_norm{norm}/{ip}_{species}_norm{norm}_{annotation}_metagene." + config["imagetype"]["multi_metagene"], norm = ["RPM", "SI"], ip = uniq(IP), annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
@@ -114,10 +80,6 @@ rule all:
 		expand("dummyfile/multi_metagene_divbylib_{ip}_{species}_norm{norm}_{annotation}.txt", norm = ["RPM", "SI"], ip = NORMALIZATIONS, annotation = names(ANNOTATIONS,"species","Scer"), species = ["Scer"]),
 		#metagene_bin_length_fpkm
 		expand("dummyfile/metagene_bin_length_fpkm_{sample}_{species}_norm{norm}_{annotation}.txt", sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer"], norm = ["RPM", "SI"], annotation = names(ANNOTATIONS,"length_fpkm","y")),
-		#bin_bedgraphs
-		#expand("differential_analysis/lib_norm/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_20bp.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
-		#map_to_gene
-		#expand("differential_analysis/gene_coverage/{species}_norm{norm}/{sample}_div_controlLib_{species}_norm{norm}_gene_coverage.bdg", norm = ["RPM", "SI"], sample = [k for k,v in SAMPLES.items() if v["ip"]!= "input"], species = ["Scer","Spom"]),
 		#mean_replicates
 		expand("differential_analysis/mean_replicates/{species}_norm{norm}/{ip_gtype}_div_controlLib_{species}_norm{norm}_combined_gene_coverage.bdg", norm = ["RPM", "SI"], species = ["Scer","Spom"], ip_gtype = uniq([v["group"] for k,v in SAMPLES.items() if v["ip"]!= "input"]))
 
