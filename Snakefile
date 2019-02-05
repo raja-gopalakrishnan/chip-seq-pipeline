@@ -363,19 +363,7 @@ rule deeptools_matrix_individual:
 			shell("(computeMatrix reference-point -R {input.annotation} -S {input.bigwig} --referencePoint {params.refpoint} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} {params.nan}) &> {log}")
 		else:
 			shell("(computeMatrix scale-regions -R {input.annotation} -S {input.bigwig} -out {output.dtfile} --outFileNameMatrix {output.matrix} -b {params.upstream} -a {params.downstream} --binSize {params.binsize} --sortRegions {params.sort} --sortUsing {params.sortusing} --averageTypeBins {params.binstat} -p {threads} --regionBodyLength {params.bodylength}) &> {log}")
-# Generate a heatmap using the deeptools matrix
-#rule plot_heatmap_individual:
-#	input: 
-#		dtfile = "matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.mat.gz"
-#	output:
-#		plot = "plots/heatmaps/individual/{annotation}_{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}_heatmap." + config["imagetype"]["plot_heatmap"]
-#	params:
-#		sort = lambda wildcards: config["annotations"][wildcards.annotation]["sort"],
-#		sortusing = lambda wildcards: config["annotations"][wildcards.annotation]["sortby"],
-#		missingdatacolor = lambda wildcards: config["annotations"][wildcards.annotation]["missingdatacolor"]
-#	shell:"""
-#	plotHeatmap -m {input.dtfile} -out {output.plot} --sortRegions {params.sort} --sortUsing {params.sortusing} --missingDataColor {params.missingdatacolor}
-#	"""
+# Generate an occupancy heatmap for each sample
 rule plot_heatmap_individual:
 	input: 
 		dtfile = "matrix/{annotation}/individual/{species}_norm{norm}/{sample}_{species}_norm{norm}_{annotation}.tsv.gz"
