@@ -25,11 +25,11 @@ Copy the template_config.yaml file to make the config.yaml file
 cp template_config.yaml config.yaml
 ```
 Open the config.yaml file and edit the following items:
-- ```samples``` : Edit sample names, barcode, group, ip, genotype and replicate number. Sample names should follow the ip-genotype-replicate naming system. The group attribute will by 'ip-genotype'
-- ```fastq```: Provide location of fastq file
--```normalizations```: Enter samples that each IP library should be normalized by when plotting heatmaps and metagenes. Can enter multiple values for one IP.
--```comparisons```: Enter samples that each IP library should be normalized by when comparing occupancy within genes across genotypes. Can enter only one value for each IP.
--```callpeaks```: Enter sample to be normalized by when calling for peaks using macs2. This is usually the input for all samples.
+- ```samples``` : Edit sample names, barcode, group, ip, genotype and replicate number. Sample names should follow the ip-genotype-replicate naming system. The group attribute will by 'ip-genotype'.
+- ```fastq```: Provide location of fastq file.
+- ```normalizations```: Enter samples that each IP library should be normalized by when plotting heatmaps and metagenes. Can enter multiple values for one IP.
+- ```comparisons```: Enter samples that each IP library should be normalized by when comparing occupancy within genes across genotypes. Can enter only one value for each IP.
+- ```callpeaks```: Enter sample to be normalized by when calling for peaks using macs2. This is usually the input for all samples.
 Change other parameters as required.
 
 ### 3. Create the environment to run the pipeline
