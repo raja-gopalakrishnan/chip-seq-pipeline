@@ -307,7 +307,7 @@ control_gtype: "input"
       
 #Provide name of the fastq file
 fastq:
-    "/n/groups/winston/rg161/chip-seq_pipeline/Undetermined_S0.R1.fastq.gz"
+    "path/to/fastq"
 #Demultiplexing paramaters
 demultiplex:
     #Number of bases in barcode for which a mismatch is permitted
@@ -465,8 +465,3 @@ macs2:
   fdr: 0.05
   env_name: python2
 
-browser_shots:
-  ADH1: minus
-  STE11: plus
-  TDH3: minus
-  RIX1: plus
